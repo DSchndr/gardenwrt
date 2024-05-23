@@ -5,7 +5,7 @@ openwrt on gardena smart gateway
 ```
 Your warranty is now void.
 I am not responsible for bricked devices, dead SD cards, thermonuclear war,
-or you getting fired because your mower stopped moving the football field.
+or you getting fired because your mower stopped mowing the football field.
 Please do some research if you have any concerns about features included in this ROM before flashing it!
 YOU are choosing to make these modifications, and if you point the finger at me for messing up your device, I will laugh at you.
 ```
