@@ -65,12 +65,10 @@ mtd erase uboot
 mtd write uboot ${fileaddr}
 
 flash openwrt image:
-mtd erase nand && tftp 0x81000000 openwrt-ramips-mt76x8-gardena_smart_gateway_mt7688-squashfs-factory.bin && mtd write nand 0x81000000 0 ${filesize}
-setenv bootargs "console=ttyS0,115200 root=/dev/mtdblock5 rw rootfstype=jffs2"
+setenv bootargs 'console=ttyS0,115200 mtdparts=spi-nand:16M(kernel),112M(ubi) rootfstype=squashfs ubi.mtd=4 rootfstype=squashfs,jffs2'
 setenv bootcmd "mtd read nand 0x81000000 0 1000000 && bootm 0x81000000"
-(todo shrink size since 16m is REALLY big and booting takes a lot of time.)
 saveenv
-reset
+mtd erase.dontskipbad nand && tftp 0x81000000 openwrt-ramips-mt76x8-gardena_smart_gateway_mt7688-squashfs-factory.bin && mtd write nand 0x81000000 0 ${filesize} && reset
 
 enjoy :)
 
