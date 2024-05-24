@@ -46,4 +46,30 @@ boot
 
 # Art. No. 19005
 
-TODO, got initramfs to boot.
+TODO:
+- fix dtb, basic stuff is working at least
+- wifi support (which driver?) missing
+  
+got ~initramfs~ kernel+rootfs to boot.
+
+```
+build openwrt from 19005 branch or use prebuilt files from this repo.
+
+replace stock uboot with the u-boot-with-spl.bin,
+it should be compatible with vendor uboot since the only change is being able to boot bigger kernels.
+(todo shrink size since 16m is REALLY big)
+tftp u-boot-with-spl.bin
+mtd erase uboot
+mtd write uboot ${fileaddr}
+
+flash openwrt image:
+mtd erase nand && tftp 0x81000000 openwrt-ramips-mt76x8-gardena_smart_gateway_mt7688-squashfs-factory.bin && mtd write nand 0x81000000 0 ${filesize}
+setenv bootargs "console=ttyS0,115200 root=/dev/mtdblock5 rw rootfstype=jffs2"
+setenv bootcmd "mtd read nand 0x81000000 0 1000000 && bootm 0x81000000"
+(todo shrink size since 16m is REALLY big and booting takes a lot of time.)
+saveenv
+reset
+
+enjoy :)
+
+```
