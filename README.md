@@ -65,11 +65,15 @@ mtd erase uboot
 mtd write uboot ${fileaddr}
 
 flash openwrt image:
-setenv bootargs 'console=ttyS0,115200 mtdparts=spi-nand:16M(kernel),112M(ubi) rootfstype=squashfs ubi.mtd=4 rootfstype=squashfs,jffs2'
-setenv bootcmd "mtd read nand 0x81000000 0 1000000 && bootm 0x81000000"
+(this should not be needed since it is included in the dtb)
+setenv bootargs 'console=ttyS0,115200 ubi.mtd=4 rootfstype=squashfs'
+setenv bootcmd "ubi part nand && ubi read 0x81000000 kernel && bootm 0x81000000"
 saveenv
-mtd erase.dontskipbad nand && tftp 0x81000000 openwrt-ramips-mt76x8-gardena_smart_gateway_mt7688-squashfs-factory.bin && mtd write nand 0x81000000 0 ${filesize} && reset
-
+mtd erase.dontskipbad nand && tftp 0x81000000 openwrt-ramips-mt76x8-gardena_smart_gateway_mt7688-squashfs-factory.bin && mtd write nand 0x81000000 0 ${filesize}
+(if your nand does have bad blocks and causes boot to fail, either create the kernel, rootfs and rootfs_data partitions yourself or just write over them)
+tftp 0x81000000 openwrt-ramips-mt76x8-gardena_smart_gateway_mt7688-squashfs-kernel.bin && ubi part nand && ubi write 0x80100000 kernel ${filesize}
+tftp 0x81000000 openwrt-ramips-mt76x8-gardena_smart_gateway_mt7688-squashfs-rootfs.squashfs && ubi part nand && ubi write 0x80100000 rootfs ${filesize}
+reset
 enjoy :)
 
 ```
