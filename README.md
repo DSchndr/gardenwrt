@@ -48,9 +48,8 @@ boot
 
 TODO:
 - fix dtb, basic stuff is working at least
-- wifi support (which driver?) missing
-  
-got ~initramfs~ kernel+rootfs to boot.
+- wifi support (which driver?) missing, no idea why.
+- play around with the MFI343S00177 mfi copro and maybe add homekit demo
 
 ```
 build openwrt from 19005 branch or use prebuilt files from this repo.
@@ -69,10 +68,12 @@ flash openwrt image:
 setenv bootargs 'console=ttyS0,115200 ubi.mtd=4 rootfstype=squashfs'
 setenv bootcmd "ubi part nand && ubi read 0x81000000 kernel && bootm 0x81000000"
 saveenv
-mtd erase.dontskipbad nand && tftp 0x81000000 openwrt-ramips-mt76x8-gardena_smart_gateway_mt7688-squashfs-factory.bin && mtd write nand 0x81000000 0 ${filesize}
-(if your nand does have bad blocks and causes boot to fail, either create the kernel, rootfs and rootfs_data partitions yourself or just write over them)
-tftp 0x81000000 openwrt-ramips-mt76x8-gardena_smart_gateway_mt7688-squashfs-kernel.bin && ubi part nand && ubi write 0x80100000 kernel ${filesize}
-tftp 0x81000000 openwrt-ramips-mt76x8-gardena_smart_gateway_mt7688-squashfs-rootfs.squashfs && ubi part nand && ubi write 0x80100000 rootfs ${filesize}
+mtd erase.dontskipbad nand && tftp 0x80100000 openwrt-ramips-mt76x8-gardena_smart_gateway_mt7688-squashfs-factory.bin && mtd write nand 0x80100000 0 ${filesize}
+(if your nand does have bad blocks and causes boot to fail, either create the kernel, rootfs and rootfs_data partitions yourself or just write over them:)
+ubi remove kernel && ubi remove rootfs OR mtd erase nand
+tftp 0x80100000 openwrt-ramips-mt76x8-gardena_smart_gateway_mt7688-squashfs-kernel.bin && ubi part nand && ubi create kernel ${filesize} d 0 && ubi write 0x80100000 kernel ${filesize}
+tftp 0x80100000 openwrt-ramips-mt76x8-gardena_smart_gateway_mt7688-squashfs-rootfs.squashfs && ubi part nand && ubi create rootfs ${filesize} d 1 && ubi write 0x80100000 rootfs ${filesize}
+ubi create rootfs_data - d 2
 reset
 enjoy :)
 
