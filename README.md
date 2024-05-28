@@ -47,10 +47,23 @@ boot
 # Art. No. 19005
 
 TODO:
-- fix dtb, basic stuff is working at least
-- wifi support (which driver?) missing, no idea why.
+- fix dtb
+- custom firmware for lemonbeat module to use something sane and open ([like radiohead](https://www.airspayce.com/mikem/arduino/RadioHead/))
+- reverse engineer lemonbeat part of the gateway sw (so the insane journey of homeassistant->"ratelimited definetly 24/7 for 20years available cloud"->gateway->mower can be done offline)
+- port vendor packages?
 - play around with the MFI343S00177 mfi copro and maybe add homekit demo
+- radio module uart and swd untested.
+- cpu clock seems to be lower than reported - might aswell add overclock
+- pcm (no idea, added in dtb and kernel but no audio device available)
+- pwm for rgbw stripe support
 
+what works:
+- LEDs
+- i2c (mfi chip), mcp port expander support in kernel too
+- wifi
+- ethernet
+- squeezelite client -> usb soundcard
+  
 ```
 build openwrt from 19005 branch or use prebuilt files from this repo.
 
@@ -70,11 +83,21 @@ setenv bootcmd "ubi part nand && ubi read 0x81000000 kernel && bootm 0x81000000"
 saveenv
 mtd erase.dontskipbad nand && tftp 0x80100000 openwrt-ramips-mt76x8-gardena_smart_gateway_mt7688-squashfs-factory.bin && mtd write nand 0x80100000 0 ${filesize}
 (if your nand does have bad blocks and causes boot to fail, either create the kernel, rootfs and rootfs_data partitions yourself or just write over them:)
-ubi remove kernel && ubi remove rootfs OR mtd erase nand
+ubi part nand && ubi remove kernel && ubi remove rootfs OR just mtd erase nand
 tftp 0x80100000 openwrt-ramips-mt76x8-gardena_smart_gateway_mt7688-squashfs-kernel.bin && ubi part nand && ubi create kernel ${filesize} d 0 && ubi write 0x80100000 kernel ${filesize}
 tftp 0x80100000 openwrt-ramips-mt76x8-gardena_smart_gateway_mt7688-squashfs-rootfs.squashfs && ubi part nand && ubi create rootfs ${filesize} d 1 && ubi write 0x80100000 rootfs ${filesize}
 ubi create rootfs_data - d 2
 reset
 enjoy :)
 
+```
+## luci and wifi
+no idea whats wrong, currently don't care.
+```
+ip addr add 10.42.185.63/16 dev eth0 && ip link set eth0 up
+/etc/init.d/firewall stop
+vi /etc/config/wireless (configure wireless manually)
+/etc/init.d/network restart
+chmod 0644 /usr/share/rpcd/ucode/luci
+service rpcd restart
 ```
