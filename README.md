@@ -94,7 +94,7 @@ enjoy :)
 ## luci and wifi
 no idea whats wrong, currently don't care.
 ```
-ip addr add 10.42.185.63/16 dev eth0 && ip link set eth0 up
+ip addr add 10.42.0.2/16 dev eth0 && ip link set eth0 up
 /etc/init.d/firewall stop
 vi /etc/config/wireless (configure wireless manually)
 /etc/init.d/network restart
